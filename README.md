@@ -68,7 +68,7 @@ Use `BaseController.register` to expose CRUD endpoints for the model:
 
 ```ts
 import { Hono } from "hono";
-import { BaseController } from "dmvc";
+import { BaseController, requireAuth } from "dmvc";
 import { UserModel } from "./UserModel";
 
 const app = new Hono();
@@ -82,6 +82,56 @@ export default app;
 ```
 
 You can optionally supply per-operation `roles`, a custom `authCheckFn`, or `pageSize` in the options.
+
+## Authentication
+
+`dmvc` expects an authenticated user to be attached to the `Hono` context as `c.set("user", ...)`.  
+Routes registered through `BaseController` automatically use the `requireAuth` middleware which checks the user's role, supports a custom checker, and honours the `SKIP_AUTH` environment flag and the special `anonymous` role.
+
+```ts
+import { Hono } from "hono";
+import { BaseController, requireAuth } from "dmvc";
+import { UserModel } from "./UserModel";
+
+const app = new Hono();
+
+// attach a user from your auth system (JWT, session, etc.)
+app.use("*", async (c, next) => {
+  const token = c.req.header("Authorization");
+  if (token) {
+    // decode token and set the user on the context
+    c.set("user", { id: "u123", role: "admin" });
+  }
+  await next();
+});
+
+// optional custom authorization function
+const authCheckFn = async (user: any, allowed: string[]) => {
+  if (user.role === "admin") return true; // admins always allowed
+  return allowed.includes(user.role);
+};
+
+BaseController.register(app, {
+  model: UserModel,
+  basePath: "/users",
+  roles: {
+    list: ["anonymous"],   // public route
+    get: ["user", "admin"],
+    create: ["admin"],
+    update: ["admin"],
+    delete: ["admin"],
+  },
+  authCheckFn,
+});
+
+app.get(
+  "/reports",
+  requireAuth(["admin"], authCheckFn),
+  (c) => c.text("secret")
+);
+```
+
+Set `SKIP_AUTH=true` in the environment to bypass all checks during local development.
 
 ## Hooks
 
