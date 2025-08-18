@@ -1,0 +1,26 @@
+{
+  "name": "dmvc",
+  "version": "0.1.0",
+  "description": "Minimal model/controller utilities for Hono-based REST APIs",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "hono": "^4.8.12"
+  },
+  "dependencies": {
+    "zod": "^3.24.2",
+    "electrodb": "^3.4.3",
+    "@aws-sdk/client-dynamodb": "^3.750.0",
+    "@aws-sdk/lib-dynamodb": "^3.750.0"
+  }
+}
