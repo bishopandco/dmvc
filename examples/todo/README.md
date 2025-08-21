@@ -37,3 +37,36 @@ Shut down the local database with:
 ```bash
 npm run db:down
 ```
+
+## Table configuration
+
+When defining the DynamoDB table in an SST app, include the additional indexes expected by this example:
+
+```ts
+const table = new sst.aws.Dynamo("SomeTableName", {
+  fields: {
+    pk: "string",
+    sk: "string",
+    gsi1pk: "string",
+    gsi1sk: "string",
+    gsi2pk: "string",
+    gsi2sk: "string",
+  },
+  primaryIndex: {
+    hashKey: "pk",
+    rangeKey: "sk",
+  },
+  globalIndexes: {
+    "gsi1pk-gsi1sk-index": {
+      hashKey: "gsi1pk",
+      rangeKey: "gsi1sk",
+    },
+    "gsi2pk-gsi2sk-index": {
+      hashKey: "gsi2pk",
+      rangeKey: "gsi2sk",
+    },
+  },
+});
+```
+
+These fields and indexes mirror those referenced in `index.ts` and allow for more advanced query patterns.

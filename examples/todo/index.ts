@@ -10,7 +10,7 @@ import { z } from 'zod';
 const TodoSchema = z.object({
   id: z.string(),
   title: z.string(),
-  completed: z.boolean().optional(),
+  completed: z.boolean().default(false),
 });
 
 // model backed by ElectroDB
@@ -25,10 +25,24 @@ class TodoModel extends BaseModel<typeof TodoSchema> {
         attributes: {
           id: { type: 'string', required: true },
           title: { type: 'string', required: true },
-          completed: { type: 'boolean' },
+          completed: { type: 'boolean', default: false },
+          type: { type: 'string', required: true, default: 'todo' },
         },
         indexes: {
-          primary: { pk: { field: 'pk', composite: ['id'] } },
+          primary: {
+            pk: { field: 'pk', composite: ['type'] },
+            sk: { field: 'sk', composite: ['id'] },
+          },
+          byTitle: {
+            index: 'gsi1pk-gsi1sk-index',
+            pk: { field: 'gsi1pk', composite: ['title'] },
+            sk: { field: 'gsi1sk', composite: ['id'] },
+          },
+          byCompleted: {
+            index: 'gsi2pk-gsi2sk-index',
+            pk: { field: 'gsi2pk', composite: ['completed'] },
+            sk: { field: 'gsi2sk', composite: ['id'] },
+          },
         },
       },
       { client, table }
