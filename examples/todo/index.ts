@@ -13,6 +13,12 @@ const TodoSchema = z.object({
   completed: z.boolean().default(false),
 });
 
+// schema for composite keys with defaults
+const TodoKeySchema = z.object({
+  id: z.string(),
+  type: z.literal('todo').default('todo'),
+});
+
 // model backed by ElectroDB
 class TodoModel extends BaseModel<typeof TodoSchema> {
   constructor(client: DynamoDBDocumentClient, table: string) {
@@ -44,7 +50,7 @@ class TodoModel extends BaseModel<typeof TodoSchema> {
       },
       { client, table }
     );
-    super(entity, TodoSchema, TodoSchema.pick({ id: true }), client, table);
+    super(entity, TodoSchema, TodoKeySchema, client, table);
   }
 }
 
