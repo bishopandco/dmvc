@@ -67,7 +67,7 @@ async function ensureTable() {
 }
 
 async function main() {
-  const [, , command, id] = process.argv;
+  const [, , command, arg1, arg2] = process.argv;
   try {
     await ensureTable();
     switch (command) {
@@ -77,25 +77,34 @@ async function main() {
         break;
       }
       case 'read': {
-        if (!id) throw new Error('ID required');
-        const todo = await TodoModel.get({ id });
+        if (!arg1) throw new Error('ID required');
+        const todo = await TodoModel.get({ id: arg1 });
         console.log(todo);
         break;
       }
       case 'update': {
-        if (!id) throw new Error('ID required');
-        const todo = await TodoModel.update({ id, completed: true });
+        if (!arg1) throw new Error('ID required');
+        const todo = await TodoModel.update({ id: arg1, completed: true });
         console.log(todo);
         break;
       }
       case 'destroy': {
-        if (!id) throw new Error('ID required');
-        const result = await TodoModel.delete({ id });
+        if (!arg1) throw new Error('ID required');
+        const result = await TodoModel.delete({ id: arg1 });
+        console.log(result);
+        break;
+      }
+      case 'list': {
+        const cursor = arg1;
+        const limit = arg2 ? parseInt(arg2, 10) : undefined;
+        const result = await TodoModel.list(cursor, limit);
         console.log(result);
         break;
       }
       default:
-        console.log('Usage: tsx scripts.ts <create|read|update|destroy> [id]');
+        console.log(
+          'Usage: tsx scripts.ts <create|read|update|destroy|list> [id|cursor] [limit]'
+        );
     }
   } catch (err) {
     console.error(err);
