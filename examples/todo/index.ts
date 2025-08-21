@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Hono } from 'hono';
 import { BaseController, BaseModel } from 'dmvc';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';

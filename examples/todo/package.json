@@ -11,6 +11,7 @@
     "destroy": "tsx scripts.ts destroy"
   },
   "devDependencies": {
+    "dotenv": "^16.4.5",
     "tsx": "^4.7.1"
   }
 }

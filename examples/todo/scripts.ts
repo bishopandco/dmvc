@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { randomUUID } from 'crypto';
 import { TodoModel } from './index';
 
