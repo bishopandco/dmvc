@@ -32,7 +32,11 @@ npm run create
 npm run read <id>
 npm run update <id>
 npm run destroy <id>
+npm run list [cursor] [limit]
 ```
+
+The list command returns a page of todos and prints a `cursor` value that
+can be supplied on subsequent runs to fetch the next page.
 
 Shut down the local database with:
 

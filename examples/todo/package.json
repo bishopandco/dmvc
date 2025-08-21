@@ -8,7 +8,8 @@
     "create": "tsx scripts.ts create",
     "read": "tsx scripts.ts read",
     "update": "tsx scripts.ts update",
-    "destroy": "tsx scripts.ts destroy"
+    "destroy": "tsx scripts.ts destroy",
+    "list": "tsx scripts.ts list"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",
