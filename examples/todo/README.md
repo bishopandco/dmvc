@@ -21,6 +21,8 @@ npm run db:up
 
 An `.env` file is provided that configures the table name and points the AWS SDK at the local DynamoDB endpoint exposed by `docker-compose`.
 
+The helper scripts will automatically create the required table and indexes if they do not already exist.
+
 ## CRUD helpers
 
 With DynamoDB running you can exercise the model directly from the command line:
