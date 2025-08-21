@@ -17,6 +17,9 @@
   "peerDependencies": {
     "hono": "^4.8.12"
   },
+  "devDependencies": {
+    "@types/node": "^20.14.2"
+  },
   "dependencies": {
     "zod": "^3.24.2",
     "electrodb": "^3.4.3",
