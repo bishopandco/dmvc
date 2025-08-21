@@ -36,7 +36,13 @@ class TodoModel extends BaseModel<typeof TodoSchema> {
 }
 
 // initialize DynamoDB connection once
-const raw = new DynamoDBClient({ region: 'us-east-1' });
+const raw = new DynamoDBClient({
+  region: 'us-east-1',
+  endpoint: process.env.DYNAMODB_ENDPOINT,
+  credentials: process.env.DYNAMODB_ENDPOINT
+    ? { accessKeyId: 'local', secretAccessKey: 'local' }
+    : undefined,
+});
 const client = DynamoDBDocumentClient.from(raw);
 BaseModel.configure({ client, table: process.env.DYNAMODB_TABLE_NAME! });
 
