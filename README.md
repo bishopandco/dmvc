@@ -155,6 +155,10 @@ class UserModel extends BaseModel<typeof UserSchema> {
 
 These hooks run automatically around the respective operations.
 
+## Example
+
+A minimal todo application built with dmvc lives in [examples/todo](./examples/todo). It defines a todo model and registers CRUD routes with Hono. The example's `package.json` also exposes scripts to create, read, update, and destroy todos, and includes a `docker-compose.yml` for spinning up a local DynamoDB instance. See its [README](examples/todo/README.md) for setup instructions.
+
 ---
 
 dmvc aims to stay minimal. See the source for additional helpers like `requireAuth` and `QueryService`.
