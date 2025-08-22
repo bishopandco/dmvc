@@ -183,7 +183,8 @@ export abstract class BaseModel<T extends ZodSchema<object>> {
   }
 
   public async get(key: Record<string, unknown>): Promise<z.infer<T> | null> {
-    const result = await this.entity.get(key).go();
+    const parsedKey = this.keySchema.parse(key);
+    const result = await this.entity.get(parsedKey).go();
     return result.data ?? null;
   }
 
@@ -238,12 +239,14 @@ export abstract class BaseModel<T extends ZodSchema<object>> {
       keyObj = key;
     }
 
+    const parsedKey = this.keySchema.parse(keyObj);
+
     const beforeHooks = beforeDeleteHooks.get(this.constructor.name) || [];
     for (const hook of beforeHooks) {
-      await hook(keyObj);
+      await hook(parsedKey);
     }
 
-    const result = await this.entity.delete(keyObj).go();
+    const result = await this.entity.delete(parsedKey).go();
 
     const afterHooks = afterDeleteHooks.get(this.constructor.name) || [];
     for (const hook of afterHooks) {
