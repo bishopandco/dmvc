@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "vitest run --coverage"
   },
   "publishConfig": {
     "access": "public"
@@ -19,7 +20,10 @@
     "hono": "^4.8.12"
   },
   "devDependencies": {
-    "@types/node": "^20.14.2"
+    "@types/node": "^20.14.2",
+    "@vitest/coverage-v8": "^1.6.0",
+    "hono": "^4.8.12",
+    "vitest": "^1.6.0"
   },
   "dependencies": {
     "typescript": "^5.5.3",
