@@ -7,7 +7,9 @@
 ╚═════╝   ╚═╝     ╚═╝   ╚═════╝    ╚═════╝ 
 ```
 
-# DMVC
+# dmvc
+
+[![Tests](https://github.com/bishopandco/dmvc/actions/workflows/tests.yml/badge.svg)](https://github.com/bishopandco/dmvc/actions/workflows/tests.yml)
 
 dmvc provides a minimal model/controller layer for building REST APIs on top of [Hono](https://hono.dev). It pairs [ElectroDB](https://github.com/tywalch/electrodb) for DynamoDB access with [Zod](https://zod.dev) schemas and exposes helpers to quickly register CRUD routes.
 
@@ -156,6 +158,32 @@ class UserModel extends BaseModel<typeof UserSchema> {
 ```
 
 These hooks run automatically around the respective operations.
+
+## Generator
+
+dmvc ships with a tiny CLI that scaffolds boilerplate models and controllers for you.
+
+```bash
+npx dmvc generate model widget
+# => creates src/models/Widget.ts
+
+npx dmvc generate controller widget
+# => creates src/controllers/WidgetController.ts
+```
+
+The generator creates the `src/models` and `src/controllers` directories if they do not exist and refuses to overwrite existing files.
+Edit the generated files to flesh out schemas, attributes, and any custom logic for your application.
+
+On first run, the generator asks where to place models and controllers and writes a `dmvc.config.ts` file with your answers. You can adjust this file later:
+
+```ts
+export default {
+  modelFolder: 'app/models',
+  controllerFolder: 'app/controllers',
+};
+```
+
+The generator will respect these paths when creating new files.
 
 ## Example
 
