@@ -1,0 +1,60 @@
+name: Release (patch) & Publish to npm
+
+on:
+  push:
+    branches: [release]
+
+permissions:
+  contents: write    # needed to push the version bump + tag
+
+jobs:
+  publish:
+    if: github.actor != 'github-actions[bot]'   # avoid re-trigger loop
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Use npm token
+        run: npm config set //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install deps
+        run: npm ci
+
+      # optional: run tests / build
+      - name: Test
+        run: npm test --if-present
+
+      - name: Build
+        run: npm run build --if-present
+
+      - name: Bump patch version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # bump package.json + create tag vX.Y.Z (no lockfile for libs is fine)
+          NEW_VER=$(npm version patch -m "chore: release %s [skip ci]")
+          echo "NEW_VER=$NEW_VER" >> $GITHUB_ENV
+
+      - name: Push commit and tags
+        run: |
+          git push origin HEAD:release --follow-tags
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # --provenance is nice-to-have if your pkg exports are reproducible
+          # add --access public for first-time scoped public publishes; harmless otherwise
+          npm publish --access public --provenance || npm publish --access public
