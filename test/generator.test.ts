@@ -14,6 +14,9 @@ describe('generators', () => {
       expect(existsSync(controllerPath)).toBe(true);
       const modelContent = readFileSync(modelPath, 'utf8');
       expect(modelContent).toContain('class WidgetModel');
+      expect(modelContent).toContain('widget: z.string()');
+      expect(modelContent).not.toContain('id: z.string()');
+      expect(modelContent).toContain('composite: ["widget"]');
       const controllerContent = readFileSync(controllerPath, 'utf8');
       expect(controllerContent).toContain('registerWidgetController');
     } finally {
