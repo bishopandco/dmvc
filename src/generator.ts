@@ -17,6 +17,7 @@ function ensureDir(dir: string) {
 
 export function generateModel(name: string, baseDir: string = process.cwd()) {
   const className = toPascalCase(name);
+  const idName = name.toLowerCase();
   const dir = path.join(baseDir, 'src', 'models');
   const filePath = path.join(dir, `${className}.ts`);
   ensureDir(dir);
@@ -29,12 +30,12 @@ import { z } from "zod";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 
 const ${className}Schema = z.object({
-  id: z.string(),
+  ${idName}: z.string(),
   // define additional attributes here
 });
 
 const ${className}KeySchema = z.object({
-  id: z.string(),
+  ${idName}: z.string(),
 });
 
 export class ${className}Model extends BaseModel<typeof ${className}Schema> {
@@ -43,12 +44,12 @@ export class ${className}Model extends BaseModel<typeof ${className}Schema> {
       {
         model: { entity: "${className}", version: "1", service: "app" },
         attributes: {
-          id: { type: "string", required: true },
+          ${idName}: { type: "string", required: true },
         },
         indexes: {
           primary: {
-            pk: { field: "pk", composite: ["id"] },
-            sk: { field: "sk", composite: ["id"] },
+            pk: { field: "pk", composite: ["${idName}"] },
+            sk: { field: "sk", composite: ["${idName}"] },
           },
         },
       },
