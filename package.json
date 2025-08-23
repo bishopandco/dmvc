@@ -50,5 +50,8 @@
   "bugs": {
     "url": "https://github.com/bishopandco/dmvc/issues"
   },
-  "homepage": "https://github.com/bishopandco/dmvc#readme"
+  "homepage": "https://github.com/bishopandco/dmvc#readme",
+  "bin": {
+    "dmvc": "dist/generator.js"
+  }
 }
