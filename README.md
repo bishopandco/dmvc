@@ -7,16 +7,18 @@
 ╚═════╝   ╚═╝     ╚═╝   ╚═════╝    ╚═════╝ 
 ```
 
-# DMVC 
+# DMVC
 
 dmvc provides a minimal model/controller layer for building REST APIs on top of [Hono](https://hono.dev). It pairs [ElectroDB](https://github.com/tywalch/electrodb) for DynamoDB access with [Zod](https://zod.dev) schemas and exposes helpers to quickly register CRUD routes.
 
+Install via `npm i @bishop-and-co/dmvc`. Source code is available on [GitHub](https://github.com/bishopandco/dmvc).
+
 ## Installation
 
-`hono` is a peer dependency and must be installed in your application along with dmvc's runtime dependencies:
+`hono` is a peer dependency and must be installed in your application along with DMVC's runtime dependencies:
 
 ```bash
-npm install dmvc hono zod electrodb @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
+npm install @bishop-and-co/dmvc hono zod electrodb @aws-sdk/client-dynamodb @aws-sdk/lib-dynamodb
 ```
 
 ## Defining a model
@@ -24,7 +26,7 @@ npm install dmvc hono zod electrodb @aws-sdk/client-dynamodb @aws-sdk/lib-dynamo
 Create a model by extending `BaseModel`. The model wires up a Zod schema and ElectroDB entity:
 
 ```ts
-import { BaseModel } from "dmvc";
+import { BaseModel } from "@bishop-and-co/dmvc";
 import { Entity } from "electrodb";
 import { z } from "zod";
 
@@ -55,7 +57,7 @@ Configure the DynamoDB connection once during startup:
 ```ts
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { BaseModel } from "dmvc";
+import { BaseModel } from "@bishop-and-co/dmvc";
 
 const raw = new DynamoDBClient({ region: "us-east-1" });
 const client = DynamoDBDocumentClient.from(raw);
@@ -68,7 +70,7 @@ Use `BaseController.register` to expose CRUD endpoints for the model:
 
 ```ts
 import { Hono } from "hono";
-import { BaseController, requireAuth } from "dmvc";
+import { BaseController, requireAuth } from "@bishop-and-co/dmvc";
 import { UserModel } from "./UserModel";
 
 const app = new Hono();
@@ -90,7 +92,7 @@ Routes registered through `BaseController` automatically use the `requireAuth` m
 
 ```ts
 import { Hono } from "hono";
-import { BaseController, requireAuth } from "dmvc";
+import { BaseController, requireAuth } from "@bishop-and-co/dmvc";
 import { UserModel } from "./UserModel";
 
 const app = new Hono();
@@ -138,7 +140,7 @@ Set `SKIP_AUTH=true` in the environment to bypass all checks during local develo
 `BaseModel` supports lifecycle hooks via decorators:
 
 ```ts
-import { BeforeCreate, AfterDelete } from "dmvc";
+import { BeforeCreate, AfterDelete } from "@bishop-and-co/dmvc";
 
 class UserModel extends BaseModel<typeof UserSchema> {
   @BeforeCreate

@@ -1,6 +1,6 @@
 # Todo Example
 
-This example shows a tiny todo application built with [dmvc](../../README.md), [Hono](https://hono.dev) and DynamoDB.
+This example shows a tiny todo application built with [DMVC](https://github.com/bishopandco/dmvc) (install via `npm i @bishop-and-co/dmvc`), [Hono](https://hono.dev) and DynamoDB.
 
 ## Prerequisites
 
