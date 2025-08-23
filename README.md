@@ -174,6 +174,17 @@ npx dmvc generate controller widget
 The generator creates the `src/models` and `src/controllers` directories if they do not exist and refuses to overwrite existing files.
 Edit the generated files to flesh out schemas, attributes, and any custom logic for your application.
 
+On first run, the generator asks where to place models and controllers and writes a `dmvc.config.ts` file with your answers. You can adjust this file later:
+
+```ts
+export default {
+  modelFolder: 'app/models',
+  controllerFolder: 'app/controllers',
+};
+```
+
+The generator will respect these paths when creating new files.
+
 ## Example
 
 A minimal todo application built with dmvc lives in [examples/todo](./examples/todo). It defines a todo model and registers CRUD routes with Hono. The example's `package.json` also exposes scripts to create, read, update, and destroy todos, and includes a `docker-compose.yml` for spinning up a local DynamoDB instance. See its [README](examples/todo/README.md) for setup instructions.

@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync, existsSync } from 'fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'fs';
 import path from 'path';
+import { createRequire } from 'module';
+import ts from 'typescript';
+import readlineSync from 'readline-sync';
 
 function toPascalCase(str: string): string {
   return str
@@ -15,10 +18,47 @@ function ensureDir(dir: string) {
   }
 }
 
+interface DmvcConfig {
+  modelFolder?: string;
+  controllerFolder?: string;
+}
+
+function loadConfig(baseDir: string): DmvcConfig {
+  const configPath = path.join(baseDir, 'dmvc.config.ts');
+  if (!existsSync(configPath)) {
+    const modelFolder =
+      readlineSync.question('Model folder (default: src/models): ') ||
+      'src/models';
+    const controllerFolder =
+      readlineSync.question('Controller folder (default: src/controllers): ') ||
+      'src/controllers';
+    const content = `export default { modelFolder: '${modelFolder}', controllerFolder: '${controllerFolder}' };\n`;
+    writeFileSync(configPath, content);
+    return { modelFolder, controllerFolder };
+  }
+  const source = readFileSync(configPath, 'utf8');
+  const { outputText } = ts.transpileModule(source, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  });
+  const requireFn = createRequire(configPath);
+  const module = { exports: {} as any };
+  const fn = new Function(
+    'exports',
+    'require',
+    'module',
+    '__filename',
+    '__dirname',
+    outputText,
+  );
+  fn(module.exports, requireFn, module, configPath, path.dirname(configPath));
+  return module.exports.default || module.exports;
+}
+
 export function generateModel(name: string, baseDir: string = process.cwd()) {
   const className = toPascalCase(name);
   const idName = name.toLowerCase();
-  const dir = path.join(baseDir, 'src', 'models');
+  const config = loadConfig(baseDir);
+  const dir = path.join(baseDir, config.modelFolder ?? 'src/models');
   const filePath = path.join(dir, `${className}.ts`);
   ensureDir(dir);
   if (existsSync(filePath)) {
@@ -68,7 +108,8 @@ export function generateController(
   baseDir: string = process.cwd()
 ) {
   const className = toPascalCase(name);
-  const dir = path.join(baseDir, 'src', 'controllers');
+  const config = loadConfig(baseDir);
+  const dir = path.join(baseDir, config.controllerFolder ?? 'src/controllers');
   const filePath = path.join(dir, `${className}Controller.ts`);
   ensureDir(dir);
   if (existsSync(filePath)) {
