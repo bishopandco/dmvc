@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Hono } from 'hono';
-import { BaseController, BaseModel } from 'dmvc';
+import { BaseController, BaseModel } from '@bishop-and-co/dmvc';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { Entity } from 'electrodb';

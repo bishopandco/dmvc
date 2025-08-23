@@ -11,6 +11,10 @@
     "destroy": "tsx scripts.ts destroy",
     "list": "tsx scripts.ts list"
   },
+  "dependencies": {
+    "@bishop-and-co/dmvc": "^0.1.0",
+    "hono": "^4.8.12"
+  },
   "devDependencies": {
     "dotenv": "^16.4.5",
     "tsx": "^4.7.1"
