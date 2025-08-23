@@ -30,7 +30,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Install deps
-        run: npm ci
+        run: npm ci || npm install --no-package-lock
 
       # optional: run tests / build
       - name: Test
