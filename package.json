@@ -1,5 +1,5 @@
 {
-  "name": "dmvc",
+  "name": "@bishop-and-co/dmvc",
   "version": "0.1.0",
   "description": "Minimal model/controller utilities for Hono-based REST APIs",
   "license": "ISC",
@@ -28,5 +28,23 @@
     "electrodb": "^3.4.3",
     "@aws-sdk/client-dynamodb": "^3.750.0",
     "@aws-sdk/lib-dynamodb": "^3.750.0"
-  }
+  },
+  "directories": {
+    "example": "examples"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bishopandco/dmvc.git"
+  },
+  "keywords": [
+    "hono",
+    "crud",
+    "dynamodb",
+    "electrodb"
+  ],
+  "author": "Michael Bishop <michael@bishopand.com>",
+  "bugs": {
+    "url": "https://github.com/bishopandco/dmvc/issues"
+  },
+  "homepage": "https://github.com/bishopandco/dmvc#readme"
 }
