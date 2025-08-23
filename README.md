@@ -174,7 +174,7 @@ npx dmvc generate controller widget
 The generator creates the `src/models` and `src/controllers` directories if they do not exist and refuses to overwrite existing files.
 Edit the generated files to flesh out schemas, attributes, and any custom logic for your application.
 
-You can customise the output locations by adding a `dmvc.config.ts` file to your project root:
+On first run, the generator asks where to place models and controllers and writes a `dmvc.config.ts` file with your answers. You can adjust this file later:
 
 ```ts
 export default {

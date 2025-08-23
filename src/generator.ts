@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
 import ts from 'typescript';
+import readlineSync from 'readline-sync';
 
 function toPascalCase(str: string): string {
   return str
@@ -25,7 +26,15 @@ interface DmvcConfig {
 function loadConfig(baseDir: string): DmvcConfig {
   const configPath = path.join(baseDir, 'dmvc.config.ts');
   if (!existsSync(configPath)) {
-    return {};
+    const modelFolder =
+      readlineSync.question('Model folder (default: src/models): ') ||
+      'src/models';
+    const controllerFolder =
+      readlineSync.question('Controller folder (default: src/controllers): ') ||
+      'src/controllers';
+    const content = `export default { modelFolder: '${modelFolder}', controllerFolder: '${controllerFolder}' };\n`;
+    writeFileSync(configPath, content);
+    return { modelFolder, controllerFolder };
   }
   const source = readFileSync(configPath, 'utf8');
   const { outputText } = ts.transpileModule(source, {
