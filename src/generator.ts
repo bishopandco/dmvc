@@ -57,9 +57,10 @@ function loadConfig(baseDir: string): DmvcConfig {
 export function generateModel(name: string, baseDir: string = process.cwd()) {
   const className = toPascalCase(name);
   const idName = name.toLowerCase();
+  const modelClassName = `${className}Model`;
   const config = loadConfig(baseDir);
   const dir = path.join(baseDir, config.modelFolder ?? 'src/models');
-  const filePath = path.join(dir, `${className}.ts`);
+  const filePath = path.join(dir, `${modelClassName}.ts`);
   ensureDir(dir);
   if (existsSync(filePath)) {
     throw new Error(`Model already exists: ${filePath}`);
@@ -68,9 +69,16 @@ export function generateModel(name: string, baseDir: string = process.cwd()) {
 import { Entity } from "electrodb";
 import { z } from "zod";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { ulid } from "ulid";
 
 const ${className}Schema = z.object({
-  ${idName}: z.string(),
+  ${idName}: z.string().default(() => ulid()),
+  createdAt: z
+    .string()
+    .default(() => new Date().toISOString()),
+  updatedAt: z
+    .string()
+    .default(() => new Date().toISOString()),
   // define additional attributes here
 });
 
@@ -78,13 +86,15 @@ const ${className}KeySchema = z.object({
   ${idName}: z.string(),
 });
 
-export class ${className}Model extends BaseModel<typeof ${className}Schema> {
+export class ${modelClassName} extends BaseModel<typeof ${className}Schema> {
   constructor(client: DynamoDBDocumentClient, table: string) {
     const entity = new Entity(
       {
         model: { entity: "${className}", version: "1", service: "app" },
         attributes: {
-          ${idName}: { type: "string", required: true },
+          ${idName}: { type: "string", required: true, default: () => ulid() },
+          createdAt: { type: "string", default: () => new Date().toISOString() },
+          updatedAt: { type: "string", default: () => new Date().toISOString() },
         },
         indexes: {
           primary: {
@@ -119,7 +129,7 @@ export function generateController(
   const basePath = `/${name.toLowerCase()}s`;
   const content = `import { Hono } from "hono";
 import { BaseController } from "@bishop-and-co/dmvc";
-import { ${modelImport} } from "../models/${className}";
+import { ${modelImport} } from "../models/${modelImport}";
 
 export function register${className}Controller(app: Hono) {
   BaseController.register(app, { model: ${modelImport}, basePath: "${basePath}" });
