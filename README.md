@@ -7,7 +7,9 @@
 ╚═════╝   ╚═╝     ╚═╝   ╚═════╝    ╚═════╝ 
 ```
 
-# DMVC
+# dmvc
+
+[![Tests](https://github.com/bishopco/dmvc/actions/workflows/test.yml/badge.svg)](https://github.com/bishopco/dmvc/actions/workflows/test.yml)
 
 dmvc provides a minimal model/controller layer for building REST APIs on top of [Hono](https://hono.dev). It pairs [ElectroDB](https://github.com/tywalch/electrodb) for DynamoDB access with [Zod](https://zod.dev) schemas and exposes helpers to quickly register CRUD routes.
 
