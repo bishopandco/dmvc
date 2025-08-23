@@ -21,16 +21,32 @@ describe('generators', () => {
       const modelPath = generateModel('widget', dir);
       const controllerPath = generateController('widget', dir);
       expect(modelPath).toContain(path.join('app', 'models'));
+      expect(path.basename(modelPath)).toBe('WidgetModel.ts');
       expect(controllerPath).toContain(path.join('app', 'controllers'));
       expect(existsSync(modelPath)).toBe(true);
       expect(existsSync(controllerPath)).toBe(true);
       const modelContent = readFileSync(modelPath, 'utf8');
       expect(modelContent).toContain('class WidgetModel');
-      expect(modelContent).toContain('widget: z.string()');
+      expect(modelContent).toContain('import { ulid } from "ulid"');
+      expect(modelContent).toContain('widget: z.string().default(() => ulid())');
+      expect(modelContent).toContain(
+        'createdAt: z\n    .string()\n    .default(() => new Date().toISOString())',
+      );
+      expect(modelContent).toContain(
+        'updatedAt: z\n    .string()\n    .default(() => new Date().toISOString())',
+      );
       expect(modelContent).not.toContain('id: z.string()');
+      expect(modelContent).toContain('widget: { type: "string", required: true, default: () => ulid() },');
+      expect(modelContent).toContain(
+        'createdAt: { type: "string", default: () => new Date().toISOString() },',
+      );
+      expect(modelContent).toContain(
+        'updatedAt: { type: "string", default: () => new Date().toISOString() },',
+      );
       expect(modelContent).toContain('composite: ["widget"]');
       const controllerContent = readFileSync(controllerPath, 'utf8');
       expect(controllerContent).toContain('registerWidgetController');
+      expect(controllerContent).toContain('import { WidgetModel } from "../models/WidgetModel"');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -52,6 +68,7 @@ describe('generators', () => {
       const controllerPath = generateController('gadget', dir);
       expect(rl.question).toHaveBeenCalledTimes(2);
       expect(modelPath).toContain(path.join('app', 'models'));
+      expect(path.basename(modelPath)).toBe('GadgetModel.ts');
       expect(controllerPath).toContain(path.join('app', 'controllers'));
     } finally {
       rmSync(dir, { recursive: true, force: true });
