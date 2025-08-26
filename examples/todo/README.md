@@ -29,9 +29,9 @@ With DynamoDB running you can exercise the model directly from the command line:
 
 ```bash
 npm run create
-npm run read <id>
-npm run update <id>
-npm run destroy <id>
+npm run read <todo>
+npm run update <todo>
+npm run destroy <todo>
 npm run list [cursor] [limit]
 ```
 

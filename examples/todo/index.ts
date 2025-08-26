@@ -8,14 +8,14 @@ import { z } from 'zod';
 
 // define the todo schema
 const TodoSchema = z.object({
-  id: z.string(),
+  todo: z.string(),
   title: z.string(),
   completed: z.boolean().default(false),
 });
 
 // schema for composite keys with defaults
 const TodoKeySchema = z.object({
-  id: z.string(),
+  todo: z.string(),
   type: z.literal('todo').default('todo'),
 });
 
@@ -26,7 +26,7 @@ class TodoModel extends BaseModel<typeof TodoSchema> {
       {
         model: { entity: 'Todo', version: '1', service: 'app' },
         attributes: {
-          id: { type: 'string', required: true },
+          todo: { type: 'string', required: true },
           title: { type: 'string', required: true },
           completed: { type: 'boolean', default: false },
           type: { type: 'string', required: true, default: 'todo' },
@@ -34,17 +34,17 @@ class TodoModel extends BaseModel<typeof TodoSchema> {
         indexes: {
           primary: {
             pk: { field: 'pk', composite: ['type'] },
-            sk: { field: 'sk', composite: ['id'] },
+            sk: { field: 'sk', composite: ['todo'] },
           },
           byTitle: {
             index: 'gsi1pk-gsi1sk-index',
             pk: { field: 'gsi1pk', composite: ['title'] },
-            sk: { field: 'gsi1sk', composite: ['id'] },
+            sk: { field: 'gsi1sk', composite: ['todo'] },
           },
           byCompleted: {
             index: 'gsi2pk-gsi2sk-index',
             pk: { field: 'gsi2pk', composite: ['completed'] },
-            sk: { field: 'gsi2sk', composite: ['id'] },
+            sk: { field: 'gsi2sk', composite: ['todo'] },
           },
         },
       },
