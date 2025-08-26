@@ -25,7 +25,7 @@ npm install @bishop-and-co/dmvc hono zod electrodb @aws-sdk/client-dynamodb @aws
 
 ## Defining a model
 
-Create a model by extending `BaseModel`. The model wires up a Zod schema and ElectroDB entity:
+Create a model by extending `BaseModel`. ElectroDB conventions use the model name itself as the identifier attribute, so avoid generic `id` or `modelId` fields. The model wires up a Zod schema and ElectroDB entity:
 
 ```ts
 import { BaseModel } from "@bishop-and-co/dmvc";
@@ -33,7 +33,7 @@ import { Entity } from "electrodb";
 import { z } from "zod";
 
 const UserSchema = z.object({
-  userId: z.string(),
+  user: z.string(), // model id
   name: z.string().optional(),
 });
 
@@ -41,12 +41,12 @@ export class UserModel extends BaseModel<typeof UserSchema> {
   constructor(client: any, table: string) {
     super(client, table);
     this.schema = UserSchema;
-    this.keySchema = UserSchema.pick({ userId: true });
+    this.keySchema = UserSchema.pick({ user: true });
     this.entity = new Entity(
       {
         model: { entity: "User", version: "1", service: "app" },
-        attributes: { userId: { type: "string", required: true }, name: { type: "string" } },
-        indexes: { primary: { pk: { field: "pk", composite: ["userId"] } } },
+        attributes: { user: { type: "string", required: true }, name: { type: "string" } },
+        indexes: { primary: { pk: { field: "pk", composite: ["user"] } } },
       },
       { client, table }
     );
@@ -104,7 +104,7 @@ app.use("*", async (c, next) => {
   const token = c.req.header("Authorization");
   if (token) {
     // decode token and set the user on the context
-    c.set("user", { id: "u123", role: "admin" });
+    c.set("user", { user: "u123", role: "admin" });
   }
   await next();
 });
