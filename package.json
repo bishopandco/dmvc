@@ -17,12 +17,22 @@
     "access": "public"
   },
   "peerDependencies": {
+    "fastify": "^4.28.1",
     "hono": "^4.8.12"
+  },
+  "peerDependenciesMeta": {
+    "fastify": {
+      "optional": true
+    },
+    "hono": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
     "@types/readline-sync": "^1.4.8",
     "@vitest/coverage-v8": "^3.2.4",
+    "fastify": "^4.28.1",
     "hono": "^4.8.12",
     "vitest": "^3.2.4"
   },

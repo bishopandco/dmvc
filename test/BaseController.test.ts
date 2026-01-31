@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Hono } from 'hono';
+import fastify from 'fastify';
 import { BaseController, BaseModel } from '../src';
 import { FakeEntity, ItemSchema, KeySchema, CompositeKeySchema } from './utils';
 
@@ -50,6 +51,12 @@ describe('BaseController with single key', () => {
     expect(created.status).toBe(201);
     const data = await created.json();
     expect(data.createdBy).toBe('u1');
+
+    const listRes = await app.request('/items');
+    expect(listRes.status).toBe(200);
+
+    const countRes = await app.request('/items/_count');
+    expect(countRes.status).toBe(200);
 
     const origCreate = CtrlModel.create;
     (CtrlModel as any).create = async () => ({ id: 'x' });
@@ -136,5 +143,79 @@ describe('BaseController with composite key', () => {
 
     const notFound = await app.request('/multi/1', { method: 'DELETE' });
     expect(notFound.status).toBe(404);
+  });
+});
+
+describe('BaseController Fastify integration', () => {
+  it('handles CRUD operations', async () => {
+    CtrlModel.configure({ client: {} as any, table: 't' });
+    const app = fastify();
+    app.addHook('preHandler', async (request) => {
+      (request as any).user = { id: 'f1', role: 'admin' };
+    });
+
+    BaseController.registerFastify(app as any, {
+      model: CtrlModel as any,
+      basePath: '/items',
+    });
+
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/items',
+      payload: { id: '1', name: 'fastify' },
+    });
+    expect(createRes.statusCode).toBe(201);
+    const created = createRes.json();
+    expect(created.createdBy).toBe('f1');
+
+    const getRes = await app.inject({ method: 'GET', url: '/items/1' });
+    expect(getRes.statusCode).toBe(200);
+
+    const updateRes = await app.inject({
+      method: 'PATCH',
+      url: '/items',
+      payload: { id: '1', name: 'updated' },
+    });
+    expect(updateRes.statusCode).toBe(200);
+
+    const listRes = await app.inject({ method: 'GET', url: '/items' });
+    expect(listRes.statusCode).toBe(200);
+
+    const countRes = await app.inject({ method: 'GET', url: '/items/_count' });
+    expect(countRes.statusCode).toBe(200);
+
+    const deleteRes = await app.inject({ method: 'DELETE', url: '/items/1' });
+    expect(deleteRes.statusCode).toBe(200);
+
+    const missing = await app.inject({ method: 'GET', url: '/items/2' });
+    expect(missing.statusCode).toBe(404);
+
+    await app.close();
+  });
+});
+
+describe('BaseController Fastify composite key', () => {
+  it('resolves composite deletes', async () => {
+    CompModel.configure({ client: {} as any, table: 't' });
+    const app = fastify();
+    app.addHook('preHandler', async (request) => {
+      (request as any).user = { id: 'f2', role: 'admin' };
+    });
+
+    BaseController.registerFastify(app as any, {
+      model: CompModel as any,
+      basePath: '/multi',
+    });
+
+    const getRes = await app.inject({ method: 'GET', url: '/multi/1' });
+    expect(getRes.statusCode).toBe(200);
+
+    const delRes = await app.inject({ method: 'DELETE', url: '/multi/1' });
+    expect(delRes.statusCode).toBe(200);
+
+    const missingDelete = await app.inject({ method: 'DELETE', url: '/multi/1' });
+    expect(missingDelete.statusCode).toBe(404);
+
+    await app.close();
   });
 });
