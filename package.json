@@ -1,6 +1,6 @@
 {
   "name": "@bishop-and-co/dmvc",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Minimal model/controller utilities for Hono-based REST APIs",
   "license": "ISC",
   "main": "dist/index.js",
