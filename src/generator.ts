@@ -139,25 +139,51 @@ export function register${className}Controller(app: Hono) {
   return filePath;
 }
 
-if (require.main === module) {
-  const [command, type, name] = process.argv.slice(2);
+export function runCli({
+  argv = process.argv,
+  baseDir = process.cwd(),
+  logger = console,
+  exit = process.exit,
+}: {
+  argv?: string[];
+  baseDir?: string;
+  logger?: Pick<typeof console, 'log' | 'error'>;
+  exit?: (code?: number) => never;
+} = {}) {
+  const [command, type, name] = argv.slice(2);
   if (command !== 'generate' || !type || !name) {
-    console.error('Usage: dmvc generate [model|controller] Name');
-    process.exit(1);
+    logger.error('Usage: dmvc generate [model|controller] Name');
+    return exit(1);
   }
   try {
     if (type === 'model') {
-      const fp = generateModel(name);
-      console.log(`Created model: ${path.relative(process.cwd(), fp)}`);
+      const fp = generateModel(name, baseDir);
+      logger.log(`Created model: ${path.relative(baseDir, fp)}`);
     } else if (type === 'controller') {
-      const fp = generateController(name);
-      console.log(`Created controller: ${path.relative(process.cwd(), fp)}`);
+      const fp = generateController(name, baseDir);
+      logger.log(`Created controller: ${path.relative(baseDir, fp)}`);
     } else {
-      console.error('Unknown type: ' + type);
-      process.exit(1);
+      logger.error('Unknown type: ' + type);
+      return exit(1);
     }
   } catch (err: any) {
-    console.error(err.message);
-    process.exit(1);
+    logger.error(err.message);
+    return exit(1);
   }
 }
+
+export function runCliIfMain({
+  mainModule = module,
+  requireMain = require.main,
+  run = runCli,
+}: {
+  mainModule?: NodeModule;
+  requireMain?: NodeModule;
+  run?: () => void;
+} = {}) {
+  if (requireMain === mainModule) {
+    run();
+  }
+}
+
+runCliIfMain();

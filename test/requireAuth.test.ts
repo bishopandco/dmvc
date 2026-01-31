@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Hono } from 'hono';
-import { requireAuth } from '../src';
+import fastify from 'fastify';
+import { requireAuth, requireAuthFastify } from '../src';
 
 describe('requireAuth', () => {
   beforeEach(() => {
@@ -80,5 +81,93 @@ describe('requireAuth', () => {
     app.get('/', (c) => c.text('ok'));
     const res = await app.request('/');
     expect(res.status).toBe(403);
+  });
+});
+
+describe('requireAuthFastify', () => {
+  beforeEach(() => {
+    delete process.env.SKIP_AUTH;
+  });
+
+  it('skips when SKIP_AUTH is true', async () => {
+    process.env.SKIP_AUTH = 'true';
+    const app = fastify();
+    const hook = requireAuthFastify(['user']);
+    if (!hook) throw new Error('Expected hook');
+    app.get('/', { preHandler: hook }, async (_, reply) => reply.send('ok'));
+    const res = await app.inject({ method: 'GET', url: '/' });
+    expect(res.statusCode).toBe(200);
+    await app.close();
+  });
+
+  it('allows anonymous role', async () => {
+    const app = fastify();
+    const hook = requireAuthFastify(['anonymous']);
+    app.get('/', hook ? { preHandler: hook } : {}, async (_, reply) => reply.send('ok'));
+    const res = await app.inject({ method: 'GET', url: '/' });
+    expect(res.statusCode).toBe(200);
+    await app.close();
+  });
+
+  it('rejects without user', async () => {
+    const app = fastify();
+    const hook = requireAuthFastify(['user']);
+    if (!hook) throw new Error('Expected hook');
+    app.get('/', { preHandler: hook }, async (_, reply) => reply.send('ok'));
+    const res = await app.inject({ method: 'GET', url: '/' });
+    expect(res.statusCode).toBe(401);
+    await app.close();
+  });
+
+  it('rejects when role not allowed', async () => {
+    const app = fastify();
+    const hook = requireAuthFastify(['admin']);
+    if (!hook) throw new Error('Expected hook');
+    app.addHook('preHandler', async (request) => {
+      (request as any).user = { role: 'guest' };
+    });
+    app.get('/', { preHandler: hook }, async (_, reply) => reply.send('ok'));
+    const res = await app.inject({ method: 'GET', url: '/' });
+    expect(res.statusCode).toBe(403);
+    await app.close();
+  });
+
+  it('allows when role allowed', async () => {
+    const app = fastify();
+    const hook = requireAuthFastify(['admin']);
+    if (!hook) throw new Error('Expected hook');
+    app.addHook('preHandler', async (request) => {
+      (request as any).user = { role: 'admin' };
+    });
+    app.get('/', { preHandler: hook }, async (_, reply) => reply.send('ok'));
+    const res = await app.inject({ method: 'GET', url: '/' });
+    expect(res.statusCode).toBe(200);
+    await app.close();
+  });
+
+  it('uses custom check function', async () => {
+    const app = fastify();
+    const hook = requireAuthFastify(['member'], async () => true);
+    if (!hook) throw new Error('Expected hook');
+    app.addHook('preHandler', async (request) => {
+      (request as any).user = { role: 'user' };
+    });
+    app.get('/', { preHandler: hook }, async (_, reply) => reply.send('ok'));
+    const res = await app.inject({ method: 'GET', url: '/' });
+    expect(res.statusCode).toBe(200);
+    await app.close();
+  });
+
+  it('custom check function can reject', async () => {
+    const app = fastify();
+    const hook = requireAuthFastify(['user'], async () => false);
+    if (!hook) throw new Error('Expected hook');
+    app.addHook('preHandler', async (request) => {
+      (request as any).user = { role: 'user' };
+    });
+    app.get('/', { preHandler: hook }, async (_, reply) => reply.send('ok'));
+    const res = await app.inject({ method: 'GET', url: '/' });
+    expect(res.statusCode).toBe(403);
+    await app.close();
   });
 });
