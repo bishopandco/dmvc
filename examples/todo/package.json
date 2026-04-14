@@ -12,8 +12,8 @@
     "list": "tsx scripts.ts list"
   },
   "dependencies": {
-    "@bishop-and-co/dmvc": "^0.1.0",
-    "hono": "^4.8.12"
+    "@bishop-and-co/dmvc": "file:../..",
+    "hono": "^4.12.12"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",

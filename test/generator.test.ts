@@ -34,8 +34,8 @@ describe('generators', () => {
       expect(existsSync(controllerPath)).toBe(true);
       const modelContent = readFileSync(modelPath, 'utf8');
       expect(modelContent).toContain('class WidgetModel');
-      expect(modelContent).toContain('import { ulid } from "ulid"');
-      expect(modelContent).toContain('widget: z.string().default(() => ulid())');
+      expect(modelContent).toContain('import { randomUUID } from "node:crypto"');
+      expect(modelContent).toContain('widget: z.string().default(() => randomUUID())');
       expect(modelContent).toContain(
         'createdAt: z\n    .string()\n    .default(() => new Date().toISOString())',
       );
@@ -43,7 +43,9 @@ describe('generators', () => {
         'updatedAt: z\n    .string()\n    .default(() => new Date().toISOString())',
       );
       expect(modelContent).not.toContain('id: z.string()');
-      expect(modelContent).toContain('widget: { type: "string", required: true, default: () => ulid() },');
+      expect(modelContent).toContain(
+        'widget: { type: "string", required: true, default: () => randomUUID() },',
+      );
       expect(modelContent).toContain(
         'createdAt: { type: "string", default: () => new Date().toISOString() },',
       );

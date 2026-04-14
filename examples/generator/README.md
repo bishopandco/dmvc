@@ -11,7 +11,7 @@ npx dmvc generate model widget
 npx dmvc generate controller widget
 ```
 
-These commands create `src/models/Widget.ts` and `src/controllers/WidgetController.ts`. Edit the generated files to define attributes, validation schemas, and routes for your app.
+These commands create `src/models/WidgetModel.ts` and `src/controllers/WidgetController.ts`. Edit the generated files to define attributes, validation schemas, and routes for your app.
 
 ## Programmatic usage
 

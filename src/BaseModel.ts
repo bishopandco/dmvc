@@ -275,7 +275,7 @@ export abstract class BaseModel<T extends ZodSchema<object>> {
     } while (allItems.length < limit && nextCursor);
     return {
       data: allItems.slice(0, limit),
-      cursor: nextCursor ?? null,
+      cursor: nextCursor,
     };
   }
 
