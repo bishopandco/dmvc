@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'fs';
-import path from 'path';
-import { createRequire } from 'module';
+import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
 import ts from 'typescript';
 import readlineSync from 'readline-sync';
 
@@ -22,6 +22,8 @@ interface DmvcConfig {
   modelFolder?: string;
   controllerFolder?: string;
 }
+
+type LoggerLike = Pick<typeof console, 'log' | 'error'>;
 
 function loadConfig(baseDir: string): DmvcConfig {
   const configPath = path.join(baseDir, 'dmvc.config.ts');
@@ -65,14 +67,14 @@ export function generateModel(name: string, baseDir: string = process.cwd()) {
   if (existsSync(filePath)) {
     throw new Error(`Model already exists: ${filePath}`);
   }
-  const content = `import { BaseModel } from "@bishop-and-co/dmvc";
+  const content = `import { randomUUID } from "node:crypto";
+import { BaseModel } from "@bishop-and-co/dmvc";
 import { Entity } from "electrodb";
 import { z } from "zod";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { ulid } from "ulid";
 
 const ${className}Schema = z.object({
-  ${idName}: z.string().default(() => ulid()),
+  ${idName}: z.string().default(() => randomUUID()),
   createdAt: z
     .string()
     .default(() => new Date().toISOString()),
@@ -92,7 +94,7 @@ export class ${modelClassName} extends BaseModel<typeof ${className}Schema> {
       {
         model: { entity: "${className}", version: "1", service: "app" },
         attributes: {
-          ${idName}: { type: "string", required: true, default: () => ulid() },
+          ${idName}: { type: "string", required: true, default: () => randomUUID() },
           createdAt: { type: "string", default: () => new Date().toISOString() },
           updatedAt: { type: "string", default: () => new Date().toISOString() },
         },
@@ -147,8 +149,8 @@ export function runCli({
 }: {
   argv?: string[];
   baseDir?: string;
-  logger?: Pick<typeof console, 'log' | 'error'>;
-  exit?: (code?: number) => never;
+  logger?: LoggerLike;
+  exit?: (code?: number) => void;
 } = {}) {
   const [command, type, name] = argv.slice(2);
   if (command !== 'generate' || !type || !name) {
@@ -177,8 +179,8 @@ export function runCliIfMain({
   requireMain = require.main,
   run = runCli,
 }: {
-  mainModule?: NodeModule;
-  requireMain?: NodeModule;
+  mainModule?: unknown;
+  requireMain?: unknown;
   run?: () => void;
 } = {}) {
   if (requireMain === mainModule) {

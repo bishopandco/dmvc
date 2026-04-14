@@ -165,7 +165,7 @@ dmvc ships with a tiny CLI that scaffolds boilerplate models and controllers for
 
 ```bash
 npx dmvc generate model widget
-# => creates src/models/Widget.ts
+# => creates src/models/WidgetModel.ts
 
 npx dmvc generate controller widget
 # => creates src/controllers/WidgetController.ts
@@ -173,6 +173,7 @@ npx dmvc generate controller widget
 
 The generator creates the `src/models` and `src/controllers` directories if they do not exist and refuses to overwrite existing files.
 Edit the generated files to flesh out schemas, attributes, and any custom logic for your application.
+Generated models use Node's built-in `randomUUID()` for default ids, so there is no extra id-generation package to install.
 
 On first run, the generator asks where to place models and controllers and writes a `dmvc.config.ts` file with your answers. You can adjust this file later:
 

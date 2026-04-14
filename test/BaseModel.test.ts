@@ -96,6 +96,7 @@ describe('BaseModel', () => {
     }
     const list = await TestModel.list();
     expect(list.data.length).toBe(10);
+    expect(list.cursor).toBeTypeOf('string');
 
     const find = await TestModel.find({ name: 'n0' });
     expect(find.data[0].id).toBe('2');
@@ -112,6 +113,9 @@ describe('BaseModel', () => {
     expect(all.length).toBe(12);
     const matchedAll = await TestModel.matchAll({ name: 'n2' });
     expect(matchedAll.length).toBe(1);
+
+    const tail = await TestModel.list('10', 10);
+    expect(tail.cursor).toBeUndefined();
 
     const inst = (TestModel as any).getInstance();
     inst.entity.delete = (key: any) => ({
